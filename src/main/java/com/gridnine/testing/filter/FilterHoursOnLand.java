@@ -1,0 +1,36 @@
+package com.gridnine.testing.filter;
+
+import com.gridnine.testing.Flight;
+import com.gridnine.testing.Segment;
+
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class FilterHoursOnLand implements FilterFlights {
+
+    private int hoursOnLand;
+
+    public FilterHoursOnLand(int hoursOnLand) {
+        this.hoursOnLand = hoursOnLand;
+    }
+
+    @Override
+    public List<Flight> filter(List<Flight> flights) {
+        List<Flight> filteredFlights = new ArrayList<>();
+        for (Flight flight : flights) {
+            long minutesOnLand = 0;
+            List<Segment> segments = flight.getSegments();
+            for (int i = 0; i < segments.size() - 1; i++) {
+                minutesOnLand += ChronoUnit.MINUTES
+                        .between(segments.get(i).getArrivalDate(), segments.get(i + 1).getDepartureDate());
+            }
+            if (minutesOnLand <= hoursOnLand * 60) {
+                filteredFlights.add(flight);
+            }
+        }
+        return filteredFlights;
+    }
+
+}
